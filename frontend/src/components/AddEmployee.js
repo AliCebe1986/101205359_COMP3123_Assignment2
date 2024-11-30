@@ -13,10 +13,13 @@ const AddEmployee = () => {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
+  
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
   const handleAddEmployee = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/employees', {
+      await axios.post(`${API_URL}/employees`, {
         name,
         department,
         position,

@@ -11,7 +11,7 @@ const EmployeeList = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/employees', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         setEmployees(response.data);
@@ -24,7 +24,7 @@ const EmployeeList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/employees/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/employees/${id}`);
       setEmployees((prev) => prev.filter((employee) => employee._id !== id));
     } catch (err) {
       setError(err.response?.data?.error || 'An error occurred');
