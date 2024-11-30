@@ -14,12 +14,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-//Search for employees
+// Search for employees
 router.get('/search', async (req, res) => {
   const { name, department, position } = req.query;
   try {
     const query = {};
-    if (name) query.name = { $regex: name, $options: 'i' };
+    if (name) query.name = { $regex: name, $options: 'i' }; // Case-insensitive regex search
     if (department) query.department = department;
     if (position) query.position = position;
 
@@ -47,6 +47,9 @@ router.get('/:id', async (req, res) => {
     if (!employee) return res.status(404).json({ error: 'Employee not found' });
     res.json(employee);
   } catch (error) {
+    if (error.kind === 'ObjectId') {
+      return res.status(400).json({ error: 'Invalid employee ID format' });
+    }
     res.status(500).json({ error: error.message });
   }
 });
@@ -63,6 +66,9 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Employee not found' });
     res.json({ message: 'Employee updated successfully', updatedEmployee });
   } catch (error) {
+    if (error.kind === 'ObjectId') {
+      return res.status(400).json({ error: 'Invalid employee ID format' });
+    }
     res.status(400).json({ error: error.message });
   }
 });
@@ -75,6 +81,9 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Employee not found' });
     res.json({ message: 'Employee deleted successfully' });
   } catch (error) {
+    if (error.kind === 'ObjectId') {
+      return res.status(400).json({ error: 'Invalid employee ID format' });
+    }
     res.status(500).json({ error: error.message });
   }
 });
