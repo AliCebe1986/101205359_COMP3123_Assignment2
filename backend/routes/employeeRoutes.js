@@ -3,19 +3,15 @@ const Employee = require('../models/Employee');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.get('/search', async (req, res) => {
+  const { name, department, position } = req.query;
   try {
-    const employee = new Employee(req.body);
-    await employee.save();
-    res.status(201).json({ message: 'Employee added successfully', employee });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+    const query = {};
+    if (name) query.name = { $regex: name, $options: 'i' };
+    if (department) query.department = department;
+    if (position) query.position = position;
 
-router.get('/', async (req, res) => {
-  try {
-    const employees = await Employee.find();
+    const employees = await Employee.find(query);
     res.json(employees);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -24,12 +20,21 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    if (req.params.id === 'search') return next(); 
     const employee = await Employee.findById(req.params.id);
     if (!employee) return res.status(404).json({ error: 'Employee not found' });
     res.json(employee);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/', async (req, res) => {
+  try {
+    const employee = new Employee(req.body);
+    await employee.save();
+    res.status(201).json({ message: 'Employee added successfully', employee });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -54,21 +59,6 @@ router.delete('/:id', async (req, res) => {
     if (!deletedEmployee)
       return res.status(404).json({ error: 'Employee not found' });
     res.json({ message: 'Employee deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get('/search', async (req, res) => {
-  const { name, department, position } = req.query;
-  try {
-    const query = {};
-    if (name) query.name = { $regex: name, $options: 'i' };
-    if (department) query.department = department;
-    if (position) query.position = position;
-
-    const employees = await Employee.find(query);
-    res.json(employees);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
