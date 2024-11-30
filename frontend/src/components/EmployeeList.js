@@ -15,7 +15,7 @@ const EmployeeList = () => {
 
   const fetchEmployees = async (query = '') => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees${query}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees/search${query}`);
       setEmployees(response.data);
       setError(null);
     } catch (err) {

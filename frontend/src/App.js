@@ -5,6 +5,7 @@ import Signup from './components/Signup';
 import EmployeeList from './components/EmployeeList';
 import AddEmployee from './components/AddEmployee';
 import EditEmployee from './components/EditEmployee';
+import ViewEmployee from './components/ViewEmployee';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -44,6 +45,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/employees" /> : <Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/employees/:id" element={<ViewEmployee />} />
           <Route
             path="/employees"
             element={isAuthenticated ? <EmployeeList /> : <Navigate to="/" />}

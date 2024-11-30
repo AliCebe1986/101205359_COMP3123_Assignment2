@@ -68,7 +68,7 @@ router.get('/search', async (req, res) => {
   const { name, department, position } = req.query;
   try {
     const query = {};
-    if (name) query.name = { $regex: name, $options: 'i' };
+    if (name) query.name = { $regex: name, $options: 'i' }; 
     if (department) query.department = department;
     if (position) query.position = position;
 
