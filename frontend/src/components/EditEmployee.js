@@ -44,6 +44,10 @@ const EditEmployee = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/employees');
+  };
+
   return (
     <Container>
       <h2>Edit Employee</h2>
@@ -99,14 +103,19 @@ const EditEmployee = () => {
           <Form.Control
             type="date"
             name="dateOfHire"
-            value={employee.dateOfHire.split('T')[0]} // Tarih formatını düzenliyoruz
+            value={employee.dateOfHire.split('T')[0]}
             onChange={handleInputChange}
             required
           />
         </Form.Group>
-        <Button variant="primary" type="submit" className="mt-3">
-          Update Employee
-        </Button>
+        <div className="mt-3">
+          <Button variant="primary" type="submit">
+            Update Employee
+          </Button>{' '}
+          <Button variant="secondary" onClick={handleCancel}>
+            Cancel
+          </Button>
+        </div>
       </Form>
     </Container>
   );
