@@ -1,28 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Container, Alert, Modal } from 'react-bootstrap';
+import { Table, Button, Container, Alert, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useState({ department: '', position: '' });
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
-        setEmployees(response.data);
-      } catch (err) {
-        setError(err.response?.data?.error || 'An error occurred');
-      }
-    };
     fetchEmployees();
   }, []);
+
+  const fetchEmployees = async (query = '') => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees${query}`);
+      setEmployees(response.data);
+    } catch (err) {
+      setError(err.response?.data?.error || 'An error occurred');
+    }
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    const query = [];
+    if (searchParams.department) query.push(`department=${searchParams.department}`);
+    if (searchParams.position) query.push(`position=${searchParams.position}`);
+    const queryString = query.length > 0 ? `?${query.join('&')}` : '';
+    fetchEmployees(queryString);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSearchParams({ ...searchParams, [name]: value });
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -33,26 +45,35 @@ const EmployeeList = () => {
     }
   };
 
-  const handleView = async (id) => {
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees/${id}`);
-      setSelectedEmployee(response.data);
-      setShowModal(true);
-    } catch (err) {
-      setError(err.response?.data?.error || 'An error occurred');
-    }
-  };
-
-  const handleEdit = (id) => {
-    navigate(`/employees/edit/${id}`);
-  };
-
-  const handleCloseModal = () => setShowModal(false);
-
   return (
     <Container>
       <h2>Employee List</h2>
       {error && <Alert variant="danger">{error}</Alert>}
+      <Form className="mb-4" onSubmit={handleSearch}>
+        <Form.Group controlId="department" className="mb-3">
+          <Form.Label>Search by Department</Form.Label>
+          <Form.Control
+            type="text"
+            name="department"
+            value={searchParams.department}
+            onChange={handleInputChange}
+            placeholder="Enter department"
+          />
+        </Form.Group>
+        <Form.Group controlId="position" className="mb-3">
+          <Form.Label>Search by Position</Form.Label>
+          <Form.Control
+            type="text"
+            name="position"
+            value={searchParams.position}
+            onChange={handleInputChange}
+            placeholder="Enter position"
+          />
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          Search
+        </Button>
+      </Form>
       <Button variant="primary" className="mb-3" onClick={() => navigate('/employees/add')}>
         Add Employee
       </Button>
@@ -72,10 +93,10 @@ const EmployeeList = () => {
               <td>{employee.department}</td>
               <td>{employee.position}</td>
               <td>
-                <Button variant="info" onClick={() => handleView(employee._id)}>
+                <Button variant="info" onClick={() => navigate(`/employees/${employee._id}`)}>
                   View
                 </Button>{' '}
-                <Button variant="warning" onClick={() => handleEdit(employee._id)}>
+                <Button variant="warning" onClick={() => navigate(`/employees/edit/${employee._id}`)}>
                   Edit
                 </Button>{' '}
                 <Button variant="danger" onClick={() => handleDelete(employee._id)}>
@@ -86,30 +107,6 @@ const EmployeeList = () => {
           ))}
         </tbody>
       </Table>
-
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Employee Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedEmployee ? (
-            <div>
-              <p><strong>Name:</strong> {selectedEmployee.name}</p>
-              <p><strong>Department:</strong> {selectedEmployee.department}</p>
-              <p><strong>Position:</strong> {selectedEmployee.position}</p>
-              <p><strong>Salary:</strong> {selectedEmployee.salary}</p>
-              <p><strong>Date of Hire:</strong> {new Date(selectedEmployee.dateOfHire).toLocaleDateString()}</p>
-            </div>
-          ) : (
-            <p>Loading...</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </Container>
   );
 };
