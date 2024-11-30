@@ -6,10 +6,17 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
 });
 
-UserSchema.pre('save', async function (next) {
+UserSchema.pre('save', function (next) {
   if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+
+  bcrypt.hash(this.password, 10, (err, hash) => {
+    if (err) {
+      console.error('Hashing error:', err);
+      return next(err);
+    }
+    this.password = hash;
+    next();
+  });
 });
 
 module.exports = mongoose.model('User', UserSchema);
