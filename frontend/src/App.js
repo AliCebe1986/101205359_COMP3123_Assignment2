@@ -4,11 +4,12 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import EmployeeList from './components/EmployeeList';
 import AddEmployee from './components/AddEmployee';
+import EditEmployee from './components/EditEmployee';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
-  const isAuthenticated = !!localStorage.getItem('token'); // Check if user is logged in
+  const isAuthenticated = !!localStorage.getItem('token');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -50,6 +51,10 @@ const App = () => {
           <Route
             path="/employees/add"
             element={isAuthenticated ? <AddEmployee /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/employees/edit/:id"
+            element={isAuthenticated ? <EditEmployee /> : <Navigate to="/" />}
           />
         </Routes>
       </Container>
