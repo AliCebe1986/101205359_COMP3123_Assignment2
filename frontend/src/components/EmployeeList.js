@@ -1,41 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Container, Alert, Form } from 'react-bootstrap';
+import { Table, Button, Container, Alert } from 'react-bootstrap';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [error, setError] = useState(null);
-  const [searchParams, setSearchParams] = useState({ name: '', department: '', position: '' });
   const navigate = useNavigate();
+  const location = useLocation(); // URL'deki query parametresini almak için
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    const query = new URLSearchParams(location.search);
+    const searchQuery = query.get('search') || '';
+    fetchEmployees(searchQuery);
+  }, [location]);
 
-  const fetchEmployees = async (query = '') => {
+  const fetchEmployees = async (searchQuery = '') => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees${query}`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/employees/search?name=${searchQuery}`
+      );
       setEmployees(response.data);
       setError(null);
     } catch (err) {
       setError(err.response?.data?.error || 'An error occurred while fetching employees.');
     }
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const query = [];
-    if (searchParams.name) query.push(`name=${searchParams.name}`);
-    if (searchParams.department) query.push(`department=${searchParams.department}`);
-    if (searchParams.position) query.push(`position=${searchParams.position}`);
-    const queryString = query.length > 0 ? `?${query.join('&')}` : '';
-    fetchEmployees(queryString);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setSearchParams({ ...searchParams, [name]: value });
   };
 
   const handleDelete = async (id) => {
@@ -52,41 +41,6 @@ const EmployeeList = () => {
     <Container>
       <h2>Employee List</h2>
       {error && <Alert variant="danger">{error}</Alert>}
-      <Form className="mb-4" onSubmit={handleSearch}>
-        <Form.Group controlId="name" className="mb-3">
-          <Form.Label>Search by Name</Form.Label>
-          <Form.Control
-            type="text"
-            name="name"
-            value={searchParams.name}
-            onChange={handleInputChange}
-            placeholder="Enter name"
-          />
-        </Form.Group>
-        <Form.Group controlId="department" className="mb-3">
-          <Form.Label>Search by Department</Form.Label>
-          <Form.Control
-            type="text"
-            name="department"
-            value={searchParams.department}
-            onChange={handleInputChange}
-            placeholder="Enter department"
-          />
-        </Form.Group>
-        <Form.Group controlId="position" className="mb-3">
-          <Form.Label>Search by Position</Form.Label>
-          <Form.Control
-            type="text"
-            name="position"
-            value={searchParams.position}
-            onChange={handleInputChange}
-            placeholder="Enter position"
-          />
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          Search
-        </Button>
-      </Form>
       <Button variant="primary" className="mb-3" onClick={() => navigate('/employees/add')}>
         Add Employee
       </Button>
