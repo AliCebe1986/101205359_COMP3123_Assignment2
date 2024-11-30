@@ -42,23 +42,14 @@ const App = () => {
       </Navbar>
 
       <Container className="mt-5">
-        <Routes>
+      <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/employees" /> : <Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/employees/:id" element={<ViewEmployee />} />
-          <Route
-            path="/employees"
-            element={isAuthenticated ? <EmployeeList /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/employees/add"
-            element={isAuthenticated ? <AddEmployee /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/employees/edit/:id"
-            element={isAuthenticated ? <EditEmployee /> : <Navigate to="/" />}
-          />
-        </Routes>
+          <Route path="/employees/search" element={<EmployeeList />} /> 
+          <Route path="/employees/add" element={isAuthenticated ? <AddEmployee /> : <Navigate to="/" />} />
+          <Route path="/employees/edit/:id" element={isAuthenticated ? <EditEmployee /> : <Navigate to="/" />} />
+          <Route path="/employees/:id" element={<ViewEmployee />} /> 
+      </Routes>
       </Container>
     </Router>
   );

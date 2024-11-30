@@ -3,7 +3,6 @@ const Employee = require('../models/Employee');
 
 const router = express.Router();
 
-// Add a new employee
 router.post('/', async (req, res) => {
   try {
     const employee = new Employee(req.body);
@@ -14,7 +13,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get all employees
 router.get('/', async (req, res) => {
   try {
     const employees = await Employee.find();
@@ -24,9 +22,9 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get a specific employee by ID
 router.get('/:id', async (req, res) => {
   try {
+    if (req.params.id === 'search') return next(); 
     const employee = await Employee.findById(req.params.id);
     if (!employee) return res.status(404).json({ error: 'Employee not found' });
     res.json(employee);
@@ -35,7 +33,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update an employee by ID
 router.put('/:id', async (req, res) => {
   try {
     const updatedEmployee = await Employee.findByIdAndUpdate(
@@ -51,7 +48,6 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete an employee by ID
 router.delete('/:id', async (req, res) => {
   try {
     const deletedEmployee = await Employee.findByIdAndDelete(req.params.id);
@@ -63,12 +59,11 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Search employees by department or position or name
 router.get('/search', async (req, res) => {
   const { name, department, position } = req.query;
   try {
     const query = {};
-    if (name) query.name = { $regex: name, $options: 'i' }; 
+    if (name) query.name = { $regex: name, $options: 'i' };
     if (department) query.department = department;
     if (position) query.position = position;
 
