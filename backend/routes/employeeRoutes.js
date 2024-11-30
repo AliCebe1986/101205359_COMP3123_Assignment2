@@ -63,11 +63,12 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Search employees by department or position
+// Search employees by department or position or name
 router.get('/search', async (req, res) => {
-  const { department, position } = req.query;
+  const { name, department, position } = req.query;
   try {
     const query = {};
+    if (name) query.name = { $regex: name, $options: 'i' };
     if (department) query.department = department;
     if (position) query.position = position;
 
