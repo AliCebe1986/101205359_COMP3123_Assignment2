@@ -10,11 +10,12 @@ import { Navbar, Nav, Container, Form, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
-  const isAuthenticated = !!localStorage.getItem('token');
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
   const [searchInput, setSearchInput] = useState('');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    setIsAuthenticated(false); 
     window.location.href = '/';
   };
 
@@ -64,7 +65,12 @@ const App = () => {
 
       <Container className="mt-5">
         <Routes>
-          <Route path="/" element={isAuthenticated ? <Navigate to="/employees" /> : <Login />} />
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? <Navigate to="/employees" /> : <Login setIsAuthenticated={setIsAuthenticated} />
+            }
+          />
           <Route path="/signup" element={<Signup />} />
           <Route
             path="/employees"

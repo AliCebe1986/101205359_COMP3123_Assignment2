@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 
-const Login = () => {
+const Login = ({ setIsAuthenticated }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -17,6 +17,7 @@ const Login = () => {
         password,
       });
       localStorage.setItem('token', response.data.token);
+      setIsAuthenticated(true); // Oturum açıldı olarak ayarla
       navigate('/employees');
     } catch (err) {
       setError(err.response?.data?.error || 'An error occurred');
