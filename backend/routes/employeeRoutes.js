@@ -16,12 +16,11 @@ router.post('/', async (req, res) => {
 
 // Search for employees
 router.get('/search', async (req, res) => {
-  const { name, department, position } = req.query;
+  const { department, position } = req.query;
   try {
     const query = {};
-    if (name) query.name = { $regex: name, $options: 'i' }; // Case-insensitive regex search
-    if (department) query.department = department;
-    if (position) query.position = position;
+    if (department) query.department = { $regex: department, $options: 'i' }; 
+    if (position) query.position = { $regex: position, $options: 'i' }; 
 
     const employees = await Employee.find(query);
     res.json(employees);
