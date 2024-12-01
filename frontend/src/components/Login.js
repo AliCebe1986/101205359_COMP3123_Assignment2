@@ -17,7 +17,7 @@ const Login = ({ setIsAuthenticated }) => {
         password,
       });
       localStorage.setItem('token', response.data.token);
-      setIsAuthenticated(true); // Oturum açıldı olarak ayarla
+      setIsAuthenticated(true);
       navigate('/employees');
     } catch (err) {
       setError(err.response?.data?.error || 'An error occurred');
