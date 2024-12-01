@@ -6,25 +6,16 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [error, setError] = useState(null);
-  const [searchParams, setSearchParams] = useState({ department: '', position: '' });
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const query = new URLSearchParams(location.search);
-    const department = query.get('department') || '';
-    const position = query.get('position') || '';
-    fetchEmployees({ department, position });
+    fetchEmployees();
   }, [location]);
 
-  const fetchEmployees = async ({ department, position }) => {
+  const fetchEmployees = async () => {
     try {
-      const query = [];
-      if (department) query.push(`department=${department}`);
-      if (position) query.push(`position=${position}`);
-      const queryString = query.length > 0 ? `?${query.join('&')}` : '';
-
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees/search${queryString}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/employees`);
       setEmployees(response.data);
       setError(null);
     } catch (err) {
@@ -32,21 +23,10 @@ const EmployeeList = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setSearchParams({ ...searchParams, [name]: value });
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const query = [];
-    if (searchParams.department) query.push(`department=${searchParams.department}`);
-    if (searchParams.position) query.push(`position=${searchParams.position}`);
-    const queryString = query.length > 0 ? `?${query.join('&')}` : '';
-    navigate(`/employees${queryString}`);
-  };
-
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this employee?');
+    if (!confirmDelete) return;
+
     try {
       await axios.delete(`${process.env.REACT_APP_API_URL}/employees/${id}`);
       setEmployees((prev) => prev.filter((employee) => employee._id !== id));
@@ -60,31 +40,6 @@ const EmployeeList = () => {
     <Container>
       <h2>Employee List</h2>
       {error && <Alert variant="danger">{error}</Alert>}
-      <Form className="mb-4" onSubmit={handleSearch}>
-        <Form.Group controlId="department" className="mb-3">
-          <Form.Label>Search by Department</Form.Label>
-          <Form.Control
-            type="text"
-            name="department"
-            value={searchParams.department}
-            onChange={handleInputChange}
-            placeholder="Enter department"
-          />
-        </Form.Group>
-        <Form.Group controlId="position" className="mb-3">
-          <Form.Label>Search by Position</Form.Label>
-          <Form.Control
-            type="text"
-            name="position"
-            value={searchParams.position}
-            onChange={handleInputChange}
-            placeholder="Enter position"
-          />
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          Search
-        </Button>
-      </Form>
       <Button variant="primary" className="mb-3" onClick={() => navigate('/employees/add')}>
         Add Employee
       </Button>
